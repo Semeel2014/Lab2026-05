@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI MV Studio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    html,body{
+      width:100%;
+      height:100%;
+      overflow-x:hidden;
+      font-family:'Poppins',sans-serif;
+      background:#000;
+      color:white;
+    }
+
+    .video-container{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:-2;
+      overflow:hidden;
+    }
+
+    .video-container iframe{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:177.77vh;
+      height:56.25vw;
+      min-width:100%;
+      min-height:100%;
+      transform:translate(-50%,-50%);
+      pointer-events:none;
+    }
+
+    .overlay{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:
+        linear-gradient(
+          to bottom,
+          rgba(0,0,0,0.45),
+          rgba(0,0,0,0.75)
+        );
+      z-index:-1;
+    }
+
+    header{
+      position:fixed;
+      width:100%;
+      top:0;
+      left:0;
+      padding:24px 60px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      z-index:10;
+      backdrop-filter:blur(10px);
+      background:rgba(0,0,0,0.15);
+    }
+
+    .logo{
+      font-size:28px;
+      font-weight:700;
+      letter-spacing:2px;
+    }
+
+    .logo span{
+      color:#00e5ff;
+    }
+
+    nav a{
+      color:white;
+      text-decoration:none;
+      margin-left:32px;
+      font-size:15px;
+      opacity:0.85;
+      transition:0.3s;
+    }
+
+    nav a:hover{
+      opacity:1;
+      color:#00e5ff;
+    }
+
+    .hero{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      padding:0 8%;
+    }
+
+    .hero-content{
+      max-width:760px;
+    }
+
+    .tag{
+      display:inline-block;
+      padding:8px 18px;
+      border:1px solid rgba(255,255,255,0.2);
+      border-radius:999px;
+      font-size:13px;
+      letter-spacing:1px;
+      margin-bottom:28px;
+      backdrop-filter:blur(10px);
+      background:rgba(255,255,255,0.06);
+    }
+
+    h1{
+      font-size:78px;
+      line-height:1.05;
+      font-weight:700;
+      margin-bottom:28px;
+    }
+
+    h1 span{
+      color:#00e5ff;
+    }
+
+    .description{
+      font-size:20px;
+      line-height:1.8;
+      color:rgba(255,255,255,0.82);
+      margin-bottom:42px;
+      max-width:640px;
+    }
+
+    .buttons{
+      display:flex;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      padding:18px 34px;
+      border-radius:14px;
+      text-decoration:none;
+      font-weight:600;
+      transition:0.35s;
+    }
+
+    .btn-primary{
+      background:#00e5ff;
+      color:#000;
+    }
+
+    .btn-primary:hover{
+      transform:translateY(-3px);
+      box-shadow:0 10px 30px rgba(0,229,255,0.4);
+    }
+
+    .btn-secondary{
+      border:1px solid rgba(255,255,255,0.3);
+      color:white;
+      backdrop-filter:blur(12px);
+      background:rgba(255,255,255,0.05);
+    }
+
+    .btn-secondary:hover{
+      background:rgba(255,255,255,0.12);
+    }
+
+    .stats{
+      margin-top:70px;
+      display:flex;
+      gap:60px;
+      flex-wrap:wrap;
+    }
+
+    .stat h2{
+      font-size:42px;
+      color:#00e5ff;
+      margin-bottom:8px;
+    }
+
+    .stat p{
+      color:rgba(255,255,255,0.7);
+      font-size:14px;
+      letter-spacing:1px;
+    }
+
+    @media(max-width:992px){
+
+      header{
+        padding:20px 24px;
+      }
+
+      nav{
+        display:none;
+      }
+
+      h1{
+        font-size:52px;
+      }
+
+      .description{
+        font-size:18px;
+      }
+
+      .hero{
+        padding:0 24px;
+      }
+
+      .stats{
+        gap:30px;
+      }
+    }
+
+    @media(max-width:600px){
+
+      h1{
+        font-size:40px;
+      }
+
+      .description{
+        font-size:16px;
+      }
+
+      .btn{
+        width:100%;
+        text-align:center;
+      }
+    }
+
+    .portfolio-section{
+      padding:100px 8%;
+      background:rgba(0,0,0,0.95);
+      color:#fff;
+      position:relative;
+      z-index:5;
+    }
+
+    .portfolio-section h2{
+      font-size:42px;
+      margin-bottom:16px;
+      letter-spacing:1px;
+    }
+
+    .portfolio-section p{
+      color:rgba(255,255,255,0.72);
+      max-width:740px;
+      margin-bottom:40px;
+      line-height:1.8;
+    }
+
+    .portfolio-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:24px;
+    }
+
+    .portfolio-card{
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:24px;
+      overflow:hidden;
+      background:rgba(255,255,255,0.03);
+      box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .portfolio-card iframe{
+      width:100%;
+      height:360px;
+      display:block;
+      border:none;
+    }
+
+    .portfolio-caption{
+      padding:18px 20px;
+      background:rgba(0,0,0,0.4);
+      color:#fff;
+      font-size:16px;
+      font-weight:600;
+      letter-spacing:0.4px;
+      text-align:center;
+    }
+
+    @media(max-width:992px){
+      .portfolio-section{
+        padding:80px 6%;
+      }
+
+      .portfolio-card iframe{
+        height:260px;
+      }
+    }
+
+    @media(max-width:600px){
+      .portfolio-section{
+        padding:60px 24px;
+      }
+
+      .portfolio-card iframe{
+        height:220px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- YouTube Fullscreen Background -->
+  <div class="video-container">
+    <iframe
+      src="https://www.youtube.com/embed/CKYi4_iaDEw?autoplay=1&mute=1&controls=0&loop=1&playlist=CKYi4_iaDEw&showinfo=0&autohide=1&modestbranding=1&playsinline=1"
+      frameborder="0"
+      allow="autoplay; fullscreen"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <div class="overlay"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      AI<span>MV</span> STUDIO
+    </div>
+
+    <nav>
+      <a href="#">首頁</a>
+      <a href="#">服務項目</a>
+      <a href="#">成功案例</a>
+      <a href="#">招商合作</a>
+      <a href="#">聯絡我們</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+
+    <div class="hero-content">
+
+      <div class="tag">
+        NEXT GENERATION AI MUSIC VIDEO
+      </div>
+
+      <h1>
+        打造未來級<br>
+        <span>AI MV 商業影像</span>
+      </h1>
+
+      <p class="description">
+        結合 AI 視覺生成、電影級運鏡、品牌敘事與流量行銷，
+        協助企業與創作者快速打造高衝擊、高話題性的 AI MV 內容，
+        開啟下一世代影音商機。
+      </p>
+
+      <div class="buttons">
+        <a href="#" class="btn btn-primary">
+          立即招商合作
+        </a>
+
+        <a href="#" class="btn btn-secondary">
+          查看作品案例
+        </a>
+      </div>
+
+      <div class="stats">
+
+        <div class="stat">
+          <h2>100+</h2>
+          <p>AI VISUAL PROJECTS</p>
+        </div>
+
+        <div class="stat">
+          <h2>10M+</h2>
+          <p>SOCIAL MEDIA REACH</p>
+        </div>
+
+        <div class="stat">
+          <h2>24H</h2>
+          <p>FAST AI PRODUCTION</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="portfolio-section">
+    <div class="portfolio-header">
+      <h2>作品集展示</h2>
+      <p>以下為真實製作的 YouTube Shorts 作品，純畫面展示模式已設定為自動播放、靜音、循環播放，並去除社群互動按鈕。</p>
+    </div>
+
+    <div class="portfolio-grid">
+      <div class="portfolio-card">
+        <iframe
+          src="https://www.youtube.com/embed/h7hM5BlOcMY?autoplay=1&mute=1&loop=1&playlist=h7hM5BlOcMY&controls=0&modestbranding=1&rel=0&playsinline=1"
+          allow="autoplay; fullscreen"
+          allowfullscreen>
+        </iframe>
+        <div class="portfolio-caption">VOBO皮鞋</div>
+      </div>
+
+      <div class="portfolio-card">
+        <iframe
+          src="https://www.youtube.com/embed/bcFnNsTVntk?autoplay=1&mute=1&loop=1&playlist=bcFnNsTVntk&controls=0&modestbranding=1&rel=0&playsinline=1"
+          allow="autoplay; fullscreen"
+          allowfullscreen>
+        </iframe>
+        <div class="portfolio-caption">SHARK 鯊克防水鞋</div>
+      </div>
+
+      <div class="portfolio-card">
+        <iframe
+          src="https://www.youtube.com/embed/n9VTjZdNvEQ?autoplay=1&mute=1&loop=1&playlist=n9VTjZdNvEQ&controls=0&modestbranding=1&rel=0&playsinline=1"
+          allow="autoplay; fullscreen"
+          allowfullscreen>
+        </iframe>
+        <div class="portfolio-caption">黑武士鞋</div>
+      </div>
+    </div>
+  <section class="contact-section">
+    <div class="contact-wrapper">
+      <div class="contact-header">
+        <h2>聯絡我／合作洽詢</h2>
+        <p>填寫以下資訊，我們將盡快與您聯絡，共同打造專屬您的 AI MV 企劃案。</p>
+      </div>
+
+      <form id="contactForm" class="contact-form">
+        <div class="form-group">
+          <label for="contactName" class="form-label">姓名 <span class="required">*</span></label>
+          <input type="text" id="contactName" name="entry.1828672223" class="form-input" placeholder="請輸入您的姓名" required>
+        </div>
+
+        <div class="form-group">
+          <label for="contactEmail" class="form-label">Email <span class="required">*</span></label>
+          <input type="email" id="contactEmail" name="entry.267269794" class="form-input" placeholder="請輸入您的電子郵件" required>
+        </div>
+
+        <div class="form-group">
+          <label for="contactType" class="form-label">企劃類型 <span class="required">*</span></label>
+          <input type="text" id="contactType" name="entry.98510672" class="form-input" placeholder="如：產品宣傳、品牌故事、TVC 廣告等" required>
+        </div>
+
+        <div class="form-group">
+          <label for="contactMessage" class="form-label">需求簡述 <span class="required">*</span></label>
+          <textarea id="contactMessage" name="entry.663583590" class="form-input form-textarea" placeholder="請簡述您的企劃需求、預算、檔期等..." rows="5" required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">送出需求</button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const actionURL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe19jJ_XdtHoI5Rqk9DKWxR12_jlZsOdRso6zSrzOQBIrZYyQ/formResponse';
+      
+      // 使用 fetch 在背景送出表單（不跳轉）
+      fetch(actionURL, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors'
+      }).then(() => {
+        // 顯示成功提示視窗
+        showSuccessModal();
+        // 清空表單
+        document.getElementById('contactForm').reset();
+      }).catch(error => {
+        console.error('Error:', error);
+        alert('送出時發生錯誤，請稍後重試');
+      });
+    });
+
+    function showSuccessModal() {
+      const modal = document.createElement('div');
+      modal.className = 'success-modal';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-icon">✓</div>
+          <h3>需求已送出</h3>
+          <p>我們將盡快與您聯絡！</p>
+          <button class="modal-close-btn">關閉</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      modal.classList.add('show');
+      
+      modal.querySelector('.modal-close-btn').addEventListener('click', () => {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+      });
+      
+      setTimeout(() => {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>
